@@ -1,0 +1,32 @@
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect  # database와 dialect 둘 다 설정하기보다는 이것만 사용
+    hibernate:  # properties.hibernate.hbm2ddl.auto 대신 이렇게
+      ddl-auto: update
+    show-sql: true  # SQL 로깅을 위해 추가 추천
+    properties:
+      hibernate:
+        format_sql: true
+
+  datasource:
+    hikari:
+      maximum-pool-size: 4
+    url: jdbc:postgresql://c8m0261h0c7idk.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com/d6rg3npnf234ek
+    username: u492d912rrq1ic
+    password: p2c84656f6ef3d96c8603c1e5c52aad95f9dfacc17e0a0be4aaf03c245340b602
+    driver-class-name: org.postgresql.Driver
+
+
+
+jwt:
+  secret-key: project.notering-sns-application-2025.secret_key
+  token:
+    expired-time-ms: 2592000000
+
+
+logging:
+  level:
+    com.project.Notering.configuration.filter: DEBUG
+    com.project.Notering.service: DEBUG
+    com.project.Notering.controller: DEBUG
+    root: INFO
