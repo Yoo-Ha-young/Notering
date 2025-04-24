@@ -1,17 +1,17 @@
 /**
-=========================================================
-* Material Dashboard 2 React - v2.1.0
-=========================================================
+ =========================================================
+ * Material Dashboard 2 React - v2.1.0
+ =========================================================
 
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+ * Product Page: https://www.creative-tim.com/product/material-dashboard-react
+ * Copyright 2022 Creative Tim (https://www.creative-tim.com)
 
-Coded by www.creative-tim.com
+ Coded by www.creative-tim.com
 
  =========================================================
 
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ */
 
 import * as React from 'react';
 import { useState, useEffect } from 'react';
@@ -48,22 +48,20 @@ import Slide from '@mui/material/Slide';
 import axios from 'axios';
 
 const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & {
-    children: React.ReactElement<any, any>,
-  },
-  ref: React.Ref<unknown>,
+    props: TransitionProps & {
+      children: React.ReactElement<any, any>,
+    },
+    ref: React.Ref<unknown>,
 ) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 function MyPosts() {
-
-
   const [page, setPage] = useState(0);
   const [render, setRender] = useState(false);
   const [posts, setPosts] = useState([]);
   const [totalPage, setTotalPage] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [open, setOpen] = React.useState(false);
@@ -85,7 +83,6 @@ function MyPosts() {
 
   const handleDelete = (id) => {
     console.log('handleDelete ' + id);
-    setIsLoading(true);
     axios({
       url: '/api/v1/posts/' + id,
       method: 'DELETE',
@@ -95,20 +92,15 @@ function MyPosts() {
     })
         .then((res) => {
           console.log('success');
-          // 현재 posts 상태에서 삭제된 게시글 제거
-          setPosts(prevPosts => prevPosts.filter(post => post.id !== id));
-          // 전체 목록 새로고침
+          console.log(res);
+          console.log(page);
           handleGetPosts(page);
         })
         .catch((error) => {
           console.log(error);
           navigate('/authentication/sign-in');
-        })
-        .finally(() => {
-          setIsLoading(false);
         });
   };
-
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -126,106 +118,99 @@ function MyPosts() {
 
   const handleGetPosts = (pageNum, event) => {
     console.log('handleGetPosts');
-    setIsLoading(true);
     axios({
       url: '/api/v1/posts/my?size=5&sort=id&page=' + pageNum,
       method: 'GET',
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('token'),
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache',
-        'Expires': '0'
       },
     })
         .then((res) => {
           console.log('success');
           console.log(res);
-          setPosts(res.data.result.content || []);
-          setTotalPage(res.data.result.totalPages || 0);
+          setPosts(res.data.result.content);
+          setTotalPage(res.data.result.totalPages);
         })
         .catch((error) => {
           console.log(error);
           navigate('/authentication/sign-in');
-        })
-        .finally(() => {
-          setIsLoading(false);
         });
   };
 
-    useEffect(() => {
-    handleGetPosts(page);
-  }, [page]); // page가 변경될 때마다 데이터 새로 로드
+  useEffect(() => {
+    handleGetPosts(0);
+  }, []);
 
   return (
-    <DashboardLayout>
-      <MDBox pt={3} pb={3}>
-        {posts.map((post) => (
-          <MDBox pt={2} pb={2} px={3}>
-            <Card>
+      <DashboardLayout>
+        <MDBox pt={3} pb={3}>
+          {posts.map((post) => (
               <MDBox pt={2} pb={2} px={3}>
-                <Grid container>
-                  <Grid item xs={6}>
-                    <MDTypography fontWeight="bold" variant="body2">
-                      {post.title}
-                    </MDTypography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <MDTypography variant="body2" textAlign="right">
-                      {post.user.name}
-                    </MDTypography>
-                  </Grid>
-                </Grid>
-                <MDTypography variant="body2">{post.body}</MDTypography>
-                <Grid container>
-                  <Grid item xs={9}></Grid>
-                  <Grid item xs={1}>
-                    <Button onClick={() => handleDetail(post)}>Detail</Button>
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Button onClick={() => handleModify(post)}>Modify</Button>
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Button onClick={() => handleDelete(post.id)}>Delete</Button>
-                  </Grid>
-                </Grid>
+                <Card>
+                  <MDBox pt={2} pb={2} px={3}>
+                    <Grid container>
+                      <Grid item xs={6}>
+                        <MDTypography fontWeight="bold" variant="body2">
+                          {post.title}
+                        </MDTypography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <MDTypography variant="body2" textAlign="right">
+                          {post.user.name}
+                        </MDTypography>
+                      </Grid>
+                    </Grid>
+                    <MDTypography variant="body2">{post.body}</MDTypography>
+                    <Grid container>
+                      <Grid item xs={9}></Grid>
+                      <Grid item xs={1}>
+                        <Button onClick={() => handleDetail(post)}>Detail</Button>
+                      </Grid>
+                      <Grid item xs={1}>
+                        <Button onClick={() => handleModify(post)}>Modify</Button>
+                      </Grid>
+                      <Grid item xs={1}>
+                        <Button onClick={() => handleDelete(post.id)}>Delete</Button>
+                      </Grid>
+                    </Grid>
+                  </MDBox>
+                </Card>
               </MDBox>
-            </Card>
-          </MDBox>
-        ))}
+          ))}
 
-        <Dialog
-          open={open}
-          TransitionComponent={Transition}
-          keepMounted
-          onClose={handleClose}
-          aria-describedby="alert-dialog-slide-description"
-        >
-          <DialogTitle>{dialogTitle}</DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-slide-description">
-              {dialogMessage}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>OK</Button>
-          </DialogActions>
-        </Dialog>
-      </MDBox>
+          <Dialog
+              open={open}
+              TransitionComponent={Transition}
+              keepMounted
+              onClose={handleClose}
+              aria-describedby="alert-dialog-slide-description"
+          >
+            <DialogTitle>{dialogTitle}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-slide-description">
+                {dialogMessage}
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>OK</Button>
+            </DialogActions>
+          </Dialog>
+        </MDBox>
 
-      <MDPagination>
-        <MDPagination item>
-          <KeyboardArrowLeftIcon></KeyboardArrowLeftIcon>
-        </MDPagination>
-        {[...Array(totalPage).keys()].map((i) => (
-          <MDPagination item onClick={() => changePage(i)}>
-            {i + 1}
+        <MDPagination>
+          <MDPagination item>
+            <KeyboardArrowLeftIcon></KeyboardArrowLeftIcon>
           </MDPagination>
-        ))}
-        <MDPagination item>
-          <KeyboardArrowRightIcon></KeyboardArrowRightIcon>
+          {[...Array(totalPage).keys()].map((i) => (
+              <MDPagination item onClick={() => changePage(i)}>
+                {i + 1}
+              </MDPagination>
+          ))}
+          <MDPagination item>
+            <KeyboardArrowRightIcon></KeyboardArrowRightIcon>
+          </MDPagination>
         </MDPagination>
-      </MDPagination>
-    </DashboardLayout>
+      </DashboardLayout>
   );
 }
 

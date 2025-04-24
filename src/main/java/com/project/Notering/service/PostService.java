@@ -4,8 +4,10 @@ package com.project.Notering.service;
 import com.project.Notering.exception.ErrorCode;
 import com.project.Notering.exception.NoteringApplicationException;
 import com.project.Notering.model.Post;
+import com.project.Notering.model.entity.LikeEntity;
 import com.project.Notering.model.entity.PostEntity;
 import com.project.Notering.model.entity.UserEntity;
+import com.project.Notering.repository.LikeEntityRepository;
 import com.project.Notering.repository.PostEntityRepository;
 import com.project.Notering.repository.UserEntityRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +16,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostEntityRepository postEntityRepository;
     private final UserEntityRepository userEntityRepository;
+    private final LikeEntityRepository likeEntityRepository;
+
 
     @Transactional
     public void create(String title, String body, String userName) {
@@ -97,5 +103,38 @@ public class PostService {
         return postEntityRepository.findAllByUser(userEntity, pageable).map(Post::fromEntity);
     }
 
+    @Transactional
+    public void like(Integer postId, String userName) {
+        // post exist
+        PostEntity postEntity = postEntityRepository.findById(postId)
+                .orElseThrow(() -> new NoteringApplicationException(ErrorCode.POST_NOT_FOUND,
+                        String.format("%s not founded", postId)));
+
+        UserEntity userEntity = userEntityRepository.findByUserName(userName)
+                .orElseThrow(() -> new NoteringApplicationException(ErrorCode.USER_NOT_FOUND,
+                        String.format("%s not founded", userName)));
+
+        // checked liked -> throw
+        likeEntityRepository.findByUserAndPost(userEntity, postEntity).ifPresent(it -> {
+            throw new NoteringApplicationException(ErrorCode.ALREADY_LIKED, String.format("User %s already like post %d", userName, postId));
+        });
+
+        // like save
+        likeEntityRepository.save(LikeEntity.of(userEntity, postEntity));
+    }
+
+    @Transactional
+    public int likeCount(Integer postId) {
+        // post exist
+        PostEntity postEntity = postEntityRepository.findById(postId)
+                .orElseThrow(() -> new NoteringApplicationException(ErrorCode.POST_NOT_FOUND,
+                        String.format("%s not founded", postId)));
+
+        // count like
+//        List<LikeEntity> likeEntities = likeEntityRepository.findAllByPost(postEntity);
+//        return likeEntities.size();
+
+        return likeEntityRepository.countByPost(postEntity);
+    }
 
 }
