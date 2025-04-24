@@ -129,7 +129,7 @@ function Basic() {
                   textAlign="center"
                 >
                   <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-                    Sign in
+                    로그인
                   </MDTypography>
                 </MDBox>
                 <MDBox pt={4} pb={3} px={3}>
@@ -152,12 +152,12 @@ function Basic() {
                     </MDBox>
                     <MDBox mt={4} mb={1}>
                       <MDButton onClick={handleSignIn} variant="gradient" color="info" fullWidth>
-                        sign in
+                        로그인 하기
                       </MDButton>
                     </MDBox>
                     <MDBox mt={3} mb={1} textAlign="center">
                       <MDTypography variant="button" color="text">
-                        Don&apos;t have an account?{' '}
+                        아직 계정이 없으신가요?{' '}
                         <MDTypography
                           component={Link}
                           to="/authentication/sign-up"
@@ -166,7 +166,7 @@ function Basic() {
                           fontWeight="medium"
                           textGradient
                         >
-                          Sign Up
+                          회원가입
                         </MDTypography>
                       </MDTypography>
                     </MDBox>

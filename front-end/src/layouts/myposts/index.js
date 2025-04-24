@@ -57,11 +57,13 @@ const Transition = React.forwardRef(function Transition(
 });
 
 function MyPosts() {
+
+
   const [page, setPage] = useState(0);
   const [render, setRender] = useState(false);
   const [posts, setPosts] = useState([]);
   const [totalPage, setTotalPage] = useState(0);
-
+  const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [open, setOpen] = React.useState(false);
@@ -83,6 +85,7 @@ function MyPosts() {
 
   const handleDelete = (id) => {
     console.log('handleDelete ' + id);
+    setIsLoading(true);
     axios({
       url: '/api/v1/posts/' + id,
       method: 'DELETE',
@@ -90,17 +93,22 @@ function MyPosts() {
         Authorization: 'Bearer ' + localStorage.getItem('token'),
       },
     })
-      .then((res) => {
-        console.log('success');
-        console.log(res);
-        console.log(page);
-        handleGetPosts(page);
-      })
-      .catch((error) => {
-        console.log(error);
-        navigate('/authentication/sign-in');
-      });
+        .then((res) => {
+          console.log('success');
+          // 현재 posts 상태에서 삭제된 게시글 제거
+          setPosts(prevPosts => prevPosts.filter(post => post.id !== id));
+          // 전체 목록 새로고침
+          handleGetPosts(page);
+        })
+        .catch((error) => {
+          console.log(error);
+          navigate('/authentication/sign-in');
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
   };
+
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -118,28 +126,35 @@ function MyPosts() {
 
   const handleGetPosts = (pageNum, event) => {
     console.log('handleGetPosts');
+    setIsLoading(true);
     axios({
       url: '/api/v1/posts/my?size=5&sort=id&page=' + pageNum,
       method: 'GET',
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('token'),
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       },
     })
-      .then((res) => {
-        console.log('success');
-        console.log(res);
-        setPosts(res.data.result.content);
-        setTotalPage(res.data.result.totalPages);
-      })
-      .catch((error) => {
-        console.log(error);
-        navigate('/authentication/sign-in');
-      });
+        .then((res) => {
+          console.log('success');
+          console.log(res);
+          setPosts(res.data.result.content || []);
+          setTotalPage(res.data.result.totalPages || 0);
+        })
+        .catch((error) => {
+          console.log(error);
+          navigate('/authentication/sign-in');
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
   };
 
-  useEffect(() => {
-    handleGetPosts(0);
-  }, []);
+    useEffect(() => {
+    handleGetPosts(page);
+  }, [page]); // page가 변경될 때마다 데이터 새로 로드
 
   return (
     <DashboardLayout>

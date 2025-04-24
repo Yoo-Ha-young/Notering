@@ -109,7 +109,7 @@ function Cover() {
                 textAlign="center"
               >
                 <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-                  Sign Up
+                  회원가입
                 </MDTypography>
               </MDBox>
               <MDBox pt={4} pb={3} px={3}>
@@ -132,12 +132,12 @@ function Cover() {
                   </MDBox>
                   <MDBox mt={4} mb={1}>
                     <MDButton onClick={handleSignUp} variant="gradient" color="info" fullWidth>
-                      sign up
+                      회원가입
                     </MDButton>
                   </MDBox>
                   <MDBox mt={3} mb={1} textAlign="center">
                     <MDTypography variant="button" color="text">
-                      Already have an account?{' '}
+                      이미 계정이 있으신가요?{' '}
                       <MDTypography
                         component={Link}
                         to="/authentication/sign-in"
@@ -146,7 +146,7 @@ function Cover() {
                         fontWeight="medium"
                         textGradient
                       >
-                        Sign In
+                        로그인
                       </MDTypography>
                     </MDTypography>
                   </MDBox>
