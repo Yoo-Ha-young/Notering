@@ -2,6 +2,7 @@ package com.project.Notering.controller;
 
 import com.project.Notering.controller.request.UserJoinRequest;
 import com.project.Notering.controller.request.UserLoginRequest;
+import com.project.Notering.controller.response.AlarmResponse;
 import com.project.Notering.controller.response.Response;
 import com.project.Notering.controller.response.UserJoinResponse;
 import com.project.Notering.controller.response.UserLoginResponse;
@@ -9,10 +10,10 @@ import com.project.Notering.model.User;
 import com.project.Notering.model.entity.UserEntity;
 import com.project.Notering.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -26,14 +27,19 @@ public class UserController {
     @PostMapping("/join")
     public Response<UserJoinResponse> join(@RequestBody UserJoinRequest request) {
         // join
-        User user = userService.join(request.getName(), request.getPassword());
+        User user = userService.join(request.getUserName(), request.getPassword());
         return Response.success(UserJoinResponse.fromUser(user));
     }
 
 
     @PostMapping("/login")
     public Response<UserLoginResponse> login(@RequestBody UserLoginRequest request) {
-        String token = userService.login(request.getName(), request.getPassword());
+        String token = userService.login(request.getUserName(), request.getPassword());
         return Response.success(new UserLoginResponse(token));
+    }
+
+    @GetMapping("/alarm")
+    public Response<Page<AlarmResponse>>  alarm(Pageable pageable, Authentication authentication) {
+        return Response.success(userService.alarmList(authentication.getName(), pageable).map(AlarmResponse::fromAlarm));
     }
 }

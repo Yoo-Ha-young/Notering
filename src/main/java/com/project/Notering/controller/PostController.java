@@ -1,7 +1,9 @@
 package com.project.Notering.controller;
 
 
+import com.project.Notering.controller.request.PostCommentRequest;
 import com.project.Notering.controller.request.PostCreateRequest;
+import com.project.Notering.controller.response.CommentResponse;
 import com.project.Notering.controller.response.PostResponse;
 import com.project.Notering.controller.response.Response;
 import com.project.Notering.model.Post;
@@ -65,5 +67,18 @@ public class PostController {
     public Response<Integer> likeCount(@PathVariable Integer postId) {
         return Response.success(postService.likeCount(postId));
     }
+
+    @PostMapping("/{postId}/comments")
+    public Response<Void> comment(@PathVariable Integer postId, @RequestBody PostCommentRequest request, Authentication authentication) {
+        postService.comment(postId, authentication.getName(), request.getComment());
+        return Response.success();
+    }
+
+    @GetMapping("/{postId}/comments")
+    public Response<Page<CommentResponse>> comment(@PathVariable Integer postId, Pageable pageable, @RequestBody PostCommentRequest request, Authentication authentication) {
+
+        return Response.success(postService.getComments(postId, pageable).map(CommentResponse::fromComment));
+    }
+
 
 }

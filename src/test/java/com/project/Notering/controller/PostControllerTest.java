@@ -1,6 +1,7 @@
 package com.project.Notering.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.Notering.controller.request.PostCommentRequest;
 import com.project.Notering.controller.request.PostCreateRequest;
 import com.project.Notering.controller.request.PostModifyRequest;
 import com.project.Notering.controller.request.UserJoinRequest;
@@ -264,5 +265,44 @@ public class PostControllerTest {
                 ).andDo(print())
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    @WithMockUser
+    void comment() throws Exception {
+
+        mockMvc.perform(post("/api/v1/posts/1/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new PostCommentRequest("comment")))
+                ).andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void comment_when_not_login() throws Exception {
+
+        mockMvc.perform(post("/api/v1/posts/1/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new PostCommentRequest("comment")))
+                ).andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void comment_when_post_not_found() throws Exception {
+        // PostCommentRequest 객체 생성
+        PostCommentRequest request = new PostCommentRequest("test comment");
+
+        doThrow(new NoteringApplicationException(ErrorCode.POST_NOT_FOUND))
+                .when(postService).comment(any(), any(), any());
+
+        mockMvc.perform(post("/api/v1/posts/1/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new PostCommentRequest("comment"))))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
 
 }

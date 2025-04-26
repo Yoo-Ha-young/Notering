@@ -74,7 +74,7 @@ function Cover() {
       url: '/api/v1/users/join',
       method: 'POST',
       data: {
-        name: userName,
+        userName: userName,
         password: password,
       },
     })
