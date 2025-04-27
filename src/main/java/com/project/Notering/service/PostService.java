@@ -66,14 +66,14 @@ public class PostService {
         UserEntity userEntity = getUserOrException(userName);
         PostEntity postEntity = getPostOrException(postId);
 
-
-
         // post permission
         if(postEntity.getUser() != userEntity){
             throw new NoteringApplicationException(ErrorCode.INVALID_PERMISSION,
                     String.format("%s is not permitted with %s", userName, postId));
         }
 
+        likeEntityRepository.deleteAllByPost(postEntity);
+        commentEntityRepository.deleteAllByPost(postEntity);
         postEntityRepository.delete(postEntity);
     }
 
@@ -108,13 +108,9 @@ public class PostService {
     }
 
     @Transactional
-    public int likeCount(Integer postId) {
+    public long likeCount(Integer postId) {
         // post exist
         PostEntity postEntity = getPostOrException(postId);
-
-        // count like
-//        List<LikeEntity> likeEntities = likeEntityRepository.findAllByPost(postEntity);
-//        return likeEntities.size();
 
         return likeEntityRepository.countByPost(postEntity);
     }

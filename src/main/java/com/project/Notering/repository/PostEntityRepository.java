@@ -5,6 +5,8 @@ import com.project.Notering.model.entity.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -13,6 +15,9 @@ import java.util.Optional;
 public interface PostEntityRepository extends JpaRepository<PostEntity, Integer> {
 
 
-    Page<PostEntity> findAllByUser(UserEntity userEntity, Pageable pageable);
+    @Query("SELECT p FROM PostEntity p WHERE p.user = :user AND p.deletedAt IS NULL")
+    Page<PostEntity> findAllByUser(@Param("user") UserEntity userEntity, Pageable pageable);
+
+//    Page<PostEntity> findAllByUser(UserEntity userEntity, Pageable pageable);
 
 }

@@ -6,9 +6,12 @@ import com.project.Notering.controller.response.AlarmResponse;
 import com.project.Notering.controller.response.Response;
 import com.project.Notering.controller.response.UserJoinResponse;
 import com.project.Notering.controller.response.UserLoginResponse;
+import com.project.Notering.exception.ErrorCode;
+import com.project.Notering.exception.NoteringApplicationException;
 import com.project.Notering.model.User;
 import com.project.Notering.model.entity.UserEntity;
 import com.project.Notering.service.UserService;
+import com.project.Notering.utils.ClassUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +43,9 @@ public class UserController {
 
     @GetMapping("/alarm")
     public Response<Page<AlarmResponse>>  alarm(Pageable pageable, Authentication authentication) {
-        return Response.success(userService.alarmList(authentication.getName(), pageable).map(AlarmResponse::fromAlarm));
+        User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class).orElseThrow(() ->
+                new NoteringApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "Casting to User class failed"));
+
+        return Response.success(userService.alarmList(user.getId(), pageable).map(AlarmResponse::fromAlarm));
     }
 }
