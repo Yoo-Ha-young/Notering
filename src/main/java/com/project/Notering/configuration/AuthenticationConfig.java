@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,9 +30,12 @@ public class AuthenticationConfig {
     private String key;
 
     @Bean
+
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
-                .requestMatchers("^(?!/api/).*$");
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico", "/error")
+                .requestMatchers(HttpMethod.POST, "/api/v1/users/join", "/api/v1/users/login");
+
     }
 
 
@@ -40,7 +44,8 @@ public class AuthenticationConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/users/join", "/api/v1/users/login").permitAll()
+//                        .requestMatchers("/api/v1/users/join", "/api/v1/users/login").permitAll()
+
                         .requestMatchers("/api/v1/users/alarm/subscribe/*").permitAll()
                         .requestMatchers("/api/v1/posts/**").authenticated()  // posts 엔드포인트 명시적 설정
                         .requestMatchers("/api/v1/**").authenticated()

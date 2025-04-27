@@ -16,6 +16,11 @@ spring:
     password: p2c84656f6ef3d96c8603c1e5c52aad95f9dfacc17e0a0be4aaf03c245340b602
     driver-class-name: org.postgresql.Driver
 
+  data:
+    redis:
+      url: rediss://:pc69f01bbbe373a5649164e329f501d1a06e799182b3c22d7ba91ca47156dc0cc@ec2-54-236-127-237.compute-1.amazonaws.com:22610
+      password: pc69f01bbbe373a5649164e329f501d1a06e799182b3c22d7ba91ca47156dc0cc
+
 
 
 jwt:

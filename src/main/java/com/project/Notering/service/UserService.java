@@ -6,6 +6,7 @@ import com.project.Notering.model.Alarm;
 import com.project.Notering.model.User;
 import com.project.Notering.model.entity.UserEntity;
 import com.project.Notering.repository.AlarmEntityRepository;
+import com.project.Notering.repository.UserCacheRepository;
 import com.project.Notering.repository.UserEntityRepository;
 import com.project.Notering.utils.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,8 @@ public class UserService {
     private final UserEntityRepository userEntityRepository;
     private final AlarmEntityRepository alarmEntityRepository;
     private final BCryptPasswordEncoder encoder;
+    private final UserCacheRepository userCacheRepository;
+
 
     @Value("${jwt.secret-key}")
     private String secretKey;
@@ -34,45 +37,40 @@ public class UserService {
     private Long expiredTimeMs;
 
 
-    public User loadUserByUsername(String name) {
-        return userEntityRepository.findByUserName(name).map(User::fromEntity).orElseThrow(() ->
-                new NoteringApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not fonded", name)));
+    public User loadUserByUsername(String userName) {
+        return userCacheRepository.getUser(userName).orElseGet(() ->
+        userEntityRepository.findByUserName(userName).map(User::fromEntity).orElseThrow(() ->
+                new NoteringApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not fonded", userName)))
+        );
     }
 
-
-
     @Transactional
-    public User join(String name, String password) {
+    public User join(String userName, String password) {
 
         // 회원가입하려는 userName으로 회원가입된 user가 있는지
-        userEntityRepository.findByUserName(name
+        userEntityRepository.findByUserName(userName
         ).ifPresent(it -> {
-            throw new NoteringApplicationException(ErrorCode.DUPLICATE_USER_NAME, String.format("%s is duplicated", name));
+            throw new NoteringApplicationException(ErrorCode.DUPLICATE_USER_NAME, String.format("%s is duplicated", userName));
         });
 
         // 회원가입 진행 = user를 등록, db에 저장
-        UserEntity userEntity = userEntityRepository.save(UserEntity.of(name, encoder.encode(password)));
+        UserEntity userEntity = userEntityRepository.save(UserEntity.of(userName, encoder.encode(password)));
 
         return User.fromEntity(userEntity);
     }
 
-    // TODO : implement
-    public String login(String name, String password) {
+    public String login(String userName, String password) {
 
         // 회원입 여부 체크
-        UserEntity userEntity = userEntityRepository.findByUserName(name)
-                .orElseThrow(() -> new NoteringApplicationException(
-                        ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", name)));
+        User user = loadUserByUsername(userName);
+        userCacheRepository.setUser(user);
 
         // 비밀번호 체크 - 등록된 비밀번호와 같은지
-            if(!encoder.matches(password, userEntity.getPassword())){
+            if(!encoder.matches(password, user.getPassword())){
             throw new NoteringApplicationException(ErrorCode.INVALID_PASSWORD);
         }
 
-        // 토큰 생성
-        String token = JwtTokenUtils.generateToken(name, secretKey, expiredTimeMs);
-
-        return token;
+        return JwtTokenUtils.generateToken(userName, secretKey, expiredTimeMs);
     }
 
     public Page<Alarm> alarmList(Integer userId, Pageable pageable) {
