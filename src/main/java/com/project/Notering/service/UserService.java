@@ -73,10 +73,12 @@ public class UserService {
         return JwtTokenUtils.generateToken(userName, secretKey, expiredTimeMs);
     }
 
+
     public Page<Alarm> alarmList(Integer userId, Pageable pageable) {
 
         return alarmEntityRepository
                 .findAllByUserId(userId, pageable).map(Alarm::fromEntity);
     }
+
 
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.Where;
 
 import java.sql.Timestamp;
@@ -15,7 +16,6 @@ import java.time.Instant;
 @Getter
 @Setter
 @SQLDelete(sql = "UPDATE \"user\" SET deleted_at = NOW() where id=?")
-@Where(clause = "deleted_at is NULL")
 public class UserEntity {
 
     @Id

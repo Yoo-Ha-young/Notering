@@ -15,9 +15,9 @@ import java.util.Optional;
 public interface PostEntityRepository extends JpaRepository<PostEntity, Integer> {
 
 
-    @Query("SELECT p FROM PostEntity p WHERE p.user = :user AND p.deletedAt IS NULL")
-    Page<PostEntity> findAllByUser(@Param("user") UserEntity userEntity, Pageable pageable);
+//    @Query("SELECT p FROM PostEntity p WHERE p.user = :user AND p.deletedAt IS NULL")
+//    Page<PostEntity> findAllByUser(@Param("user") UserEntity userEntity, Pageable pageable);
 
-//    Page<PostEntity> findAllByUser(UserEntity userEntity, Pageable pageable);
+    Page<PostEntity> findAllByUser(UserEntity userEntity, Pageable pageable);
 
 }

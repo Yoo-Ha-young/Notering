@@ -75,10 +75,8 @@ public class PostController {
     }
 
     @GetMapping("/{postId}/comments")
-    public Response<Page<CommentResponse>> comment(@PathVariable Integer postId, Pageable pageable, @RequestBody PostCommentRequest request, Authentication authentication) {
-
+    public Response<Page<CommentResponse>> getComments(Pageable pageable, @PathVariable Integer postId) {
         return Response.success(postService.getComments(postId, pageable).map(CommentResponse::fromComment));
     }
-
 
 }

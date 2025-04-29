@@ -5,8 +5,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum AlarmType {
-    NEW_COMMENNT_ON_POST("new comment"),
-    NEW_LIKE_ON_POST("new post");
+    NEW_COMMENT_ON_POST("new comment!"),
+    NEW_LIKE_ON_POST("new like!");
 
     private final String alarmText;
 }

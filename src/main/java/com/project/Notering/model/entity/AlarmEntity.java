@@ -75,4 +75,5 @@ public class AlarmEntity {
 
         return entity;
     }
+
 }

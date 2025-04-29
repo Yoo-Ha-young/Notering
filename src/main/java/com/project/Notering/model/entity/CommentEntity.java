@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -16,6 +17,7 @@ import java.time.Instant;
 @Table(name = "\"comment\"", indexes={
         @Index(name = "post_id_idx", columnList = "post_id")
         })
+@SQLRestriction("deleted_at is NULL")
 @NoArgsConstructor
 public class CommentEntity {
 
@@ -54,11 +56,11 @@ public class CommentEntity {
         this.updatedAt = Timestamp.from(Instant.now());
     }
 
-    public static CommentEntity of(UserEntity user, PostEntity post, String comment) {
+    public static CommentEntity of(String comment, PostEntity post, UserEntity user) {
         CommentEntity entity = new CommentEntity();
-        entity.setUser(user);
-        entity.setPost(post);
         entity.setComment(comment);
+        entity.setPost(post);
+        entity.setUser(user);
         return entity;
     }
 }

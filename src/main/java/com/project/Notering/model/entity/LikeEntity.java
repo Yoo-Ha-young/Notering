@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.Where;
 
 import java.sql.Timestamp;
@@ -16,6 +17,7 @@ import java.time.Instant;
 @Entity
 @SQLDelete(sql = "UPDATE \"like\" SET deleted_at = NOW() where id=?")
 @Table(name = "\"Like\"")
+@SQLRestriction("deleted_at is NULL")
 @NoArgsConstructor
 public class LikeEntity {
 
